@@ -64,7 +64,9 @@ namespace Genetic_Algorithm
                 Profit = p,
             };
 
+            //TODO : Add Item to dgv
             _knapsackItems.Add(item);
+            dgvKnapsackItems.DataSource = null;
             dgvKnapsackItems.DataSource = _knapsackItems;
         }
     }

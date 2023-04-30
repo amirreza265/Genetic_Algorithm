@@ -42,9 +42,6 @@
             txtProfit = new NumericUpDown();
             label4 = new Label();
             dgvKnapsackItems = new DataGridView();
-            ItemIndex = new DataGridViewTextBoxColumn();
-            ItemWeigth = new DataGridViewTextBoxColumn();
-            ItemProfit = new DataGridViewTextBoxColumn();
             txtInitCount = new NumericUpDown();
             label2 = new Label();
             txtGenerationNumber = new NumericUpDown();
@@ -234,7 +231,6 @@
             dgvKnapsackItems.AllowUserToDeleteRows = false;
             dgvKnapsackItems.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             dgvKnapsackItems.ColumnHeadersHeight = 29;
-            dgvKnapsackItems.Columns.AddRange(new DataGridViewColumn[] { ItemIndex, ItemWeigth, ItemProfit });
             dgvKnapsackItems.Dock = DockStyle.Fill;
             dgvKnapsackItems.Location = new Point(0, 0);
             dgvKnapsackItems.Name = "dgvKnapsackItems";
@@ -243,27 +239,6 @@
             dgvKnapsackItems.RowTemplate.Height = 29;
             dgvKnapsackItems.Size = new Size(586, 312);
             dgvKnapsackItems.TabIndex = 0;
-            // 
-            // ItemIndex
-            // 
-            ItemIndex.HeaderText = "#";
-            ItemIndex.MinimumWidth = 6;
-            ItemIndex.Name = "ItemIndex";
-            ItemIndex.ReadOnly = true;
-            // 
-            // ItemWeigth
-            // 
-            ItemWeigth.HeaderText = "Weith";
-            ItemWeigth.MinimumWidth = 6;
-            ItemWeigth.Name = "ItemWeigth";
-            ItemWeigth.ReadOnly = true;
-            // 
-            // ItemProfit
-            // 
-            ItemProfit.HeaderText = "Profit";
-            ItemProfit.MinimumWidth = 6;
-            ItemProfit.Name = "ItemProfit";
-            ItemProfit.ReadOnly = true;
             // 
             // txtInitCount
             // 
@@ -448,8 +423,5 @@
         private NumericUpDown txtProfit;
         private Label label4;
         private DataGridView dgvKnapsackItems;
-        private DataGridViewTextBoxColumn ItemIndex;
-        private DataGridViewTextBoxColumn ItemWeigth;
-        private DataGridViewTextBoxColumn ItemProfit;
     }
 }
