@@ -1,14 +1,31 @@
 using Core.Domain;
 using Core.Domain.Genetic;
+using Core.Domain.Genetic.Crossover;
 using Core.Domain.Genetic.InitialPopulation;
+using Core.Domain.Genetic.Mutation;
+using Core.Domain.Genetic.Replacement;
+using Core.Domain.Genetic.Selection;
 using Genetic_Algorithm.Classes;
 using Genetic_Algorithm.Extensions;
+using ScottPlot.Plottable;
+using System.Runtime.InteropServices;
+using System.Security.Cryptography.X509Certificates;
+using System.Text;
 
 namespace Genetic_Algorithm
 {
     public partial class Form1 : Form
     {
         List<KnapsackItem> _knapsackItems;
+        ScatterPlotList<double> _scatterPlotBstList;
+        ScatterPlotList<double> _scatterPlotAvgList;
+
+
+        private double _pc = 0.8;
+        private double _pm = 0.1;
+
+        private double _alpha = 0.3;
+        private double _beta = 0.7;
         public Form1()
         {
             InitializeComponent();
@@ -18,6 +35,9 @@ namespace Genetic_Algorithm
         private void Form1_Load(object sender, EventArgs e)
         {
             dgvKnapsackItems.DataSource = _knapsackItems;
+            dgvKnapsackItems_SelectionChanged(null, null);
+            _scatterPlotBstList = formsPlot1.Plot.AddScatterList(Color.Green, markerShape: ScottPlot.MarkerShape.none);
+            _scatterPlotAvgList = formsPlot1.Plot.AddScatterList(Color.Orange, markerShape: ScottPlot.MarkerShape.none);
         }
 
         public void ConsoleLog(string message)
@@ -25,6 +45,7 @@ namespace Genetic_Algorithm
             txtConsole.Invoke(() =>
             {
                 txtConsole.AppendText(message, Color.Black);
+                txtConsole.ScrollToCaret();
             });
         }
 
@@ -33,24 +54,125 @@ namespace Genetic_Algorithm
             txtConsole.Invoke(() =>
             {
                 txtConsole.AppendText(message, logColor);
+                txtConsole.ScrollToCaret();
             });
         }
 
         private void StartTraining()
         {
-            new Thread(() =>
+            new Thread(async () =>
             {
                 long generationNumber = (long)txtGenerationNumber.Value;
+                long knapsackMax = (long)txtKnapSackMax.Value;
 
                 var random = new Random();
-                var p = GA.Functions.RandomInitialPopulation(
-                    () => random.NextDouble() >= 0.5d,
-                    (int)txtInitCount.Value
-                );
 
+                var initCount = (long)txtInitCount.Value;
+                var geneCount = _knapsackItems.Count;
+                var population = new List<Chromosome<bool>>();
 
+                //create random population
+                SetPbarMax((int)initCount);
+                for (int i = 0; i < initCount; i++)
+                {
+                    var genes = GA.Functions.RandomInitialPopulation(() => random.NextDouble() > 0.5d,
+                        (gs) =>
+                        {
+                            int profit = 0;
+                            int weigth = 0;
+                            GetProfitAndWeight(gs, out profit, out weigth);
+                            return weigth <= knapsackMax;
+                        }
+                        , geneCount);
+
+                    var ch = new Chromosome<bool>(geneCount);
+                    ch.Genes = genes;
+
+                    ch.ObjectiveFunction = (genes) =>
+                    {
+
+                        // alpha * (profit / sum(profits)) + beta * (max - w) / sum(w)
+                        int profit, weigth;
+                        GetProfitAndWeight(genes, out profit, out weigth);
+
+                        if (weigth > knapsackMax)
+                            return 0;
+
+                        return profit;
+                    };
+
+                    ch.FitnessFunction = ch.ObjectiveFunction;
+
+                    population.Add(ch);
+
+                    menuStrip1.Invoke(() =>
+                    {
+                        lblGeneratIonInfo.Text = $"Population {i + 1}";
+                        pbarGenerationProgress.Value = i + 1;
+                    });
+                }
+
+                //generation
+                SetPbarMax((int)generationNumber);
+                for (int i = 0; i < generationNumber; i++)
+                {
+                    // selection
+                    var selected = GA.Functions.FPSSelection(population);
+
+                    //crossover
+                    var childs = GA.Functions.ManyPointCrossover(selected, _pc);
+
+                    //mutation
+                    GA.Functions.BitMutation(childs, _pm);
+
+                    //crossover
+                    //childs = GA.Functions.OnePointCrossover(childs, _pc);
+
+                    //replacment
+                    await GA.Functions.ReplaceKeepBest(population, childs);
+
+                    //print best in console
+                    var best = population.MaxBy(c => c.GetFitnessValue());
+
+                    StringBuilder str = new StringBuilder();
+                    foreach (var gene in best.Genes)
+                    {
+                        int use = gene ? 1 : 0;
+                        str.Append($"{use},");
+                    }
+                    int profit = 0;
+                    int weigth = 0;
+                    GetProfitAndWeight(best.Genes, out profit, out weigth);
+                    var avgFf = population.Average(c => c.GetFitnessValue());
+                    ConsoleLog($"gn{i + 1} , [{str}] , ff :{best.GetFitnessValue()}, avg : {avgFf}, p :{profit}, w :{weigth} \n");
+
+                    menuStrip1.Invoke(() =>
+                    {
+                        lblGeneratIonInfo.Text = $"Generation {i + 1}";
+                        pbarGenerationProgress.Value = i + 1;
+                        _scatterPlotBstList.Add(i, best.FF);
+                        _scatterPlotAvgList.Add(i, avgFf);
+
+                        formsPlot1.Plot.AxisAuto();
+                        formsPlot1.Refresh();
+                    });
+                }
 
             }).Start();
+        }
+
+        private void GetProfitAndWeight(bool[] genes, out int profit, out int weigth)
+        {
+            profit = 0;
+            weigth = 0;
+            for (int j = 0; j < genes.Length; j++)
+            {
+                if (genes[j])
+                {
+                    profit += _knapsackItems[j].Profit;
+                    weigth += _knapsackItems[j].Weigth;
+                }
+            }
         }
 
         private void btnAddItem_Click(object sender, EventArgs e)
@@ -62,12 +184,47 @@ namespace Genetic_Algorithm
             {
                 Weigth = w,
                 Profit = p,
+                Id = _knapsackItems.Count + 1
             };
 
             //TODO : Add Item to dgv
             _knapsackItems.Add(item);
             dgvKnapsackItems.DataSource = null;
             dgvKnapsackItems.DataSource = _knapsackItems;
+        }
+
+        private void btnRemoveItem_Click(object sender, EventArgs e)
+        {
+            var selected = (int)dgvKnapsackItems.SelectedRows[0].Cells[0].Value;
+
+            _knapsackItems.Remove(_knapsackItems.First(i => i.Id == selected));
+        }
+
+        private void dgvKnapsackItems_SelectionChanged(object sender, EventArgs e)
+        {
+            btnRemoveItem.Enabled = dgvKnapsackItems.SelectedRows.Count > 0;
+        }
+
+        private void btnStart_Click(object sender, EventArgs e)
+        {
+            txtConsole.Clear();
+            StartTraining();
+        }
+
+        private void txtGenerationNumber_ValueChanged(object sender, EventArgs e)
+        {
+        }
+
+        private void SetPbarMax(int value)
+        {
+            menuStrip1.Invoke(() =>
+                pbarGenerationProgress.Maximum = value
+            );
+        }
+
+        private void Form1_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            Environment.Exit(0);
         }
     }
 }

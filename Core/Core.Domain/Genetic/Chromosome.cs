@@ -1,15 +1,22 @@
 ﻿
 
+using System.Text;
+
 namespace Core.Domain.Genetic
 {
     public class Chromosome<TGene>
     {
         private int _length = 1;
 
+        public int Id { get; private set; } 
+
         public Func<TGene[], double> FitnessFunction { get; set; }
         public Func<TGene[], double> ObjectiveFunction { get; set; }
 
-        public Chromosome(int length)
+        public double FF { get => GetFitnessValue(); }
+        public double OF { get => GetObjectiveValue(); }
+
+        public Chromosome(int length, int? id = null)
         {
             if (length <= 0)
             {
@@ -19,13 +26,18 @@ namespace Core.Domain.Genetic
             _length = length;
 
             Genes = new TGene[length];
+
+            if (id == null)
+                Id = new Random().Next();
+            else
+                Id = (int)id;
         }
 
-        private TGene[] Genes { get; set; }
+        public TGene[] Genes { get; set; }
 
         public int Length { get => _length; }
 
-        public TGene[] GetCopy()
+        public TGene[] GetGenesCopy()
         {
             return Genes.Clone() as TGene[];
         }
@@ -43,9 +55,9 @@ namespace Core.Domain.Genetic
             }
 
             TGene[] sub = new TGene[length];
-            for (int i = 0; i < length; i++)
+            for (int i = 0; i< length; i++)
             {
-                sub[i + start] = Get(i);
+                sub[i] = Get(i + start);
             }
 
             return sub;
@@ -88,7 +100,38 @@ namespace Core.Domain.Genetic
 
         public double GetObjectiveValue()
         {
-            return FitnessFunction(Genes);
+            return ObjectiveFunction(Genes);
+        }
+
+        public Chromosome<TGene> Copy()
+        {
+            var g = new Chromosome<TGene>(Length);
+            g.Genes = GetGenesCopy();
+            g.FitnessFunction = FitnessFunction;
+            g.ObjectiveFunction = ObjectiveFunction;
+            return g;
+        }
+
+        public override string ToString()
+        {
+            StringBuilder str = new StringBuilder();
+            str.Append($"{Id}:[");
+            foreach (var gene in Genes)
+            {
+                str.Append($"{gene},");
+            }
+            str.Append("]");
+
+            return str.ToString();
+        }
+
+        public static bool operator <(Chromosome<TGene> ch1, Chromosome<TGene> ch2)
+        {
+            return ch1.OF < ch2.OF;
+        }
+        public static bool operator >(Chromosome<TGene> ch1, Chromosome<TGene> ch2)
+        {
+            return ch1.OF > ch2.OF;
         }
     }
 }

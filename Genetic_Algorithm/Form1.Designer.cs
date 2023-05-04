@@ -42,6 +42,8 @@
             txtProfit = new NumericUpDown();
             label4 = new Label();
             dgvKnapsackItems = new DataGridView();
+            txtKnapSackMax = new NumericUpDown();
+            label5 = new Label();
             txtInitCount = new NumericUpDown();
             label2 = new Label();
             txtGenerationNumber = new NumericUpDown();
@@ -55,6 +57,7 @@
             fileToolStripMenuItem = new ToolStripMenuItem();
             toolsToolStripMenuItem = new ToolStripMenuItem();
             tpFFChart = new TabPage();
+            formsPlot1 = new ScottPlot.FormsPlot();
             txtConsole = new RichTextBox();
             ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
             splitContainer1.Panel1.SuspendLayout();
@@ -71,10 +74,12 @@
             ((System.ComponentModel.ISupportInitialize)txtWeight).BeginInit();
             ((System.ComponentModel.ISupportInitialize)txtProfit).BeginInit();
             ((System.ComponentModel.ISupportInitialize)dgvKnapsackItems).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)txtKnapSackMax).BeginInit();
             ((System.ComponentModel.ISupportInitialize)txtInitCount).BeginInit();
             ((System.ComponentModel.ISupportInitialize)txtGenerationNumber).BeginInit();
             statusStrip1.SuspendLayout();
             menuStrip1.SuspendLayout();
+            tpFFChart.SuspendLayout();
             SuspendLayout();
             // 
             // splitContainer1
@@ -91,8 +96,8 @@
             // splitContainer1.Panel2
             // 
             splitContainer1.Panel2.Controls.Add(txtConsole);
-            splitContainer1.Size = new Size(908, 701);
-            splitContainer1.SplitterDistance = 507;
+            splitContainer1.Size = new Size(961, 622);
+            splitContainer1.SplitterDistance = 493;
             splitContainer1.TabIndex = 0;
             // 
             // tabControl
@@ -103,12 +108,14 @@
             tabControl.Location = new Point(0, 0);
             tabControl.Name = "tabControl";
             tabControl.SelectedIndex = 0;
-            tabControl.Size = new Size(908, 507);
+            tabControl.Size = new Size(961, 493);
             tabControl.TabIndex = 0;
             // 
             // tpInputs
             // 
             tpInputs.Controls.Add(panel1);
+            tpInputs.Controls.Add(txtKnapSackMax);
+            tpInputs.Controls.Add(label5);
             tpInputs.Controls.Add(txtInitCount);
             tpInputs.Controls.Add(label2);
             tpInputs.Controls.Add(txtGenerationNumber);
@@ -118,7 +125,7 @@
             tpInputs.Location = new Point(4, 29);
             tpInputs.Name = "tpInputs";
             tpInputs.Padding = new Padding(3);
-            tpInputs.Size = new Size(900, 474);
+            tpInputs.Size = new Size(953, 460);
             tpInputs.TabIndex = 0;
             tpInputs.Text = "Inputs";
             tpInputs.UseVisualStyleBackColor = true;
@@ -129,10 +136,10 @@
             panel1.BorderStyle = BorderStyle.Fixed3D;
             panel1.Controls.Add(panel2);
             panel1.Dock = DockStyle.Fill;
-            panel1.Location = new Point(3, 125);
+            panel1.Location = new Point(3, 172);
             panel1.Name = "panel1";
-            panel1.Size = new Size(894, 320);
-            panel1.TabIndex = 6;
+            panel1.Size = new Size(947, 259);
+            panel1.TabIndex = 14;
             // 
             // panel2
             // 
@@ -142,7 +149,7 @@
             panel2.Dock = DockStyle.Fill;
             panel2.Location = new Point(0, 0);
             panel2.Name = "panel2";
-            panel2.Size = new Size(890, 316);
+            panel2.Size = new Size(943, 255);
             panel2.TabIndex = 7;
             // 
             // splitContainer2
@@ -163,17 +170,17 @@
             // splitContainer2.Panel2
             // 
             splitContainer2.Panel2.Controls.Add(dgvKnapsackItems);
-            splitContainer2.Size = new Size(886, 312);
-            splitContainer2.SplitterDistance = 295;
+            splitContainer2.Size = new Size(939, 251);
+            splitContainer2.SplitterDistance = 312;
             splitContainer2.SplitterWidth = 5;
             splitContainer2.TabIndex = 0;
             // 
             // btnAddItem
             // 
             btnAddItem.Dock = DockStyle.Bottom;
-            btnAddItem.Location = new Point(0, 254);
+            btnAddItem.Location = new Point(0, 193);
             btnAddItem.Name = "btnAddItem";
-            btnAddItem.Size = new Size(295, 29);
+            btnAddItem.Size = new Size(312, 29);
             btnAddItem.TabIndex = 7;
             btnAddItem.Text = "Add";
             btnAddItem.UseVisualStyleBackColor = true;
@@ -182,20 +189,24 @@
             // btnRemoveItem
             // 
             btnRemoveItem.Dock = DockStyle.Bottom;
-            btnRemoveItem.Location = new Point(0, 283);
+            btnRemoveItem.Location = new Point(0, 222);
             btnRemoveItem.Name = "btnRemoveItem";
-            btnRemoveItem.Size = new Size(295, 29);
+            btnRemoveItem.Size = new Size(312, 29);
             btnRemoveItem.TabIndex = 6;
             btnRemoveItem.Text = "Remove";
             btnRemoveItem.UseVisualStyleBackColor = true;
+            btnRemoveItem.Click += btnRemoveItem_Click;
             // 
             // txtWeight
             // 
             txtWeight.Dock = DockStyle.Top;
             txtWeight.Location = new Point(0, 67);
+            txtWeight.Maximum = new decimal(new int[] { 9999990, 0, 0, 0 });
+            txtWeight.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             txtWeight.Name = "txtWeight";
-            txtWeight.Size = new Size(295, 27);
+            txtWeight.Size = new Size(312, 27);
             txtWeight.TabIndex = 4;
+            txtWeight.Value = new decimal(new int[] { 1, 0, 0, 0 });
             // 
             // label3
             // 
@@ -211,9 +222,12 @@
             // 
             txtProfit.Dock = DockStyle.Top;
             txtProfit.Location = new Point(0, 20);
+            txtProfit.Maximum = new decimal(new int[] { 9999990, 0, 0, 0 });
+            txtProfit.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             txtProfit.Name = "txtProfit";
-            txtProfit.Size = new Size(295, 27);
+            txtProfit.Size = new Size(312, 27);
             txtProfit.TabIndex = 5;
+            txtProfit.Value = new decimal(new int[] { 1, 0, 0, 0 });
             // 
             // label4
             // 
@@ -237,8 +251,29 @@
             dgvKnapsackItems.ReadOnly = true;
             dgvKnapsackItems.RowHeadersWidth = 51;
             dgvKnapsackItems.RowTemplate.Height = 29;
-            dgvKnapsackItems.Size = new Size(586, 312);
+            dgvKnapsackItems.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dgvKnapsackItems.Size = new Size(622, 251);
             dgvKnapsackItems.TabIndex = 0;
+            // 
+            // txtKnapSackMax
+            // 
+            txtKnapSackMax.Dock = DockStyle.Top;
+            txtKnapSackMax.Increment = new decimal(new int[] { 10, 0, 0, 0 });
+            txtKnapSackMax.Location = new Point(3, 145);
+            txtKnapSackMax.Maximum = new decimal(new int[] { -1530494986, 232830, 0, 0 });
+            txtKnapSackMax.Name = "txtKnapSackMax";
+            txtKnapSackMax.Size = new Size(947, 27);
+            txtKnapSackMax.TabIndex = 13;
+            // 
+            // label5
+            // 
+            label5.AutoSize = true;
+            label5.Dock = DockStyle.Top;
+            label5.Location = new Point(3, 125);
+            label5.Name = "label5";
+            label5.Size = new Size(110, 20);
+            label5.TabIndex = 12;
+            label5.Text = "Max Knapsack :";
             // 
             // txtInitCount
             // 
@@ -247,7 +282,7 @@
             txtInitCount.Location = new Point(3, 98);
             txtInitCount.Maximum = new decimal(new int[] { -1530494986, 232830, 0, 0 });
             txtInitCount.Name = "txtInitCount";
-            txtInitCount.Size = new Size(894, 27);
+            txtInitCount.Size = new Size(947, 27);
             txtInitCount.TabIndex = 5;
             // 
             // label2
@@ -267,8 +302,9 @@
             txtGenerationNumber.Location = new Point(3, 51);
             txtGenerationNumber.Maximum = new decimal(new int[] { -1530494986, 232830, 0, 0 });
             txtGenerationNumber.Name = "txtGenerationNumber";
-            txtGenerationNumber.Size = new Size(894, 27);
+            txtGenerationNumber.Size = new Size(947, 27);
             txtGenerationNumber.TabIndex = 3;
+            txtGenerationNumber.ValueChanged += txtGenerationNumber_ValueChanged;
             // 
             // label1
             // 
@@ -284,9 +320,9 @@
             // 
             statusStrip1.ImageScalingSize = new Size(20, 20);
             statusStrip1.Items.AddRange(new ToolStripItem[] { lblGeneratIonInfo, pbarGenerationProgress, toolStripDropDownButton1 });
-            statusStrip1.Location = new Point(3, 445);
+            statusStrip1.Location = new Point(3, 431);
             statusStrip1.Name = "statusStrip1";
-            statusStrip1.Size = new Size(894, 26);
+            statusStrip1.Size = new Size(947, 26);
             statusStrip1.TabIndex = 1;
             statusStrip1.Text = "statusStrip1";
             // 
@@ -314,8 +350,9 @@
             // btnStart
             // 
             btnStart.Name = "btnStart";
-            btnStart.Size = new Size(123, 26);
+            btnStart.Size = new Size(224, 26);
             btnStart.Text = "Start";
+            btnStart.Click += btnStart_Click;
             // 
             // menuStrip1
             // 
@@ -323,7 +360,7 @@
             menuStrip1.Items.AddRange(new ToolStripItem[] { fileToolStripMenuItem, toolsToolStripMenuItem });
             menuStrip1.Location = new Point(3, 3);
             menuStrip1.Name = "menuStrip1";
-            menuStrip1.Size = new Size(894, 28);
+            menuStrip1.Size = new Size(947, 28);
             menuStrip1.TabIndex = 0;
             menuStrip1.Text = "menuStrip1";
             // 
@@ -341,20 +378,30 @@
             // 
             // tpFFChart
             // 
+            tpFFChart.Controls.Add(formsPlot1);
             tpFFChart.Location = new Point(4, 29);
             tpFFChart.Name = "tpFFChart";
             tpFFChart.Padding = new Padding(3);
-            tpFFChart.Size = new Size(900, 474);
+            tpFFChart.Size = new Size(953, 460);
             tpFFChart.TabIndex = 1;
             tpFFChart.Text = "Charts";
             tpFFChart.UseVisualStyleBackColor = true;
+            // 
+            // formsPlot1
+            // 
+            formsPlot1.Dock = DockStyle.Fill;
+            formsPlot1.Location = new Point(3, 3);
+            formsPlot1.Margin = new Padding(5, 4, 5, 4);
+            formsPlot1.Name = "formsPlot1";
+            formsPlot1.Size = new Size(947, 454);
+            formsPlot1.TabIndex = 0;
             // 
             // txtConsole
             // 
             txtConsole.Dock = DockStyle.Fill;
             txtConsole.Location = new Point(0, 0);
             txtConsole.Name = "txtConsole";
-            txtConsole.Size = new Size(908, 190);
+            txtConsole.Size = new Size(961, 125);
             txtConsole.TabIndex = 0;
             txtConsole.Text = "";
             // 
@@ -362,11 +409,12 @@
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(908, 701);
+            ClientSize = new Size(961, 622);
             Controls.Add(splitContainer1);
             MainMenuStrip = menuStrip1;
             Name = "Form1";
             Text = "GeneticAlgorithm";
+            FormClosed += Form1_FormClosed;
             Load += Form1_Load;
             splitContainer1.Panel1.ResumeLayout(false);
             splitContainer1.Panel2.ResumeLayout(false);
@@ -385,12 +433,14 @@
             ((System.ComponentModel.ISupportInitialize)txtWeight).EndInit();
             ((System.ComponentModel.ISupportInitialize)txtProfit).EndInit();
             ((System.ComponentModel.ISupportInitialize)dgvKnapsackItems).EndInit();
+            ((System.ComponentModel.ISupportInitialize)txtKnapSackMax).EndInit();
             ((System.ComponentModel.ISupportInitialize)txtInitCount).EndInit();
             ((System.ComponentModel.ISupportInitialize)txtGenerationNumber).EndInit();
             statusStrip1.ResumeLayout(false);
             statusStrip1.PerformLayout();
             menuStrip1.ResumeLayout(false);
             menuStrip1.PerformLayout();
+            tpFFChart.ResumeLayout(false);
             ResumeLayout(false);
         }
 
@@ -414,6 +464,8 @@
         private NumericUpDown txtInitCount;
         private Label label2;
         private Panel panel1;
+        private NumericUpDown txtKnapSackMax;
+        private Label label5;
         private Panel panel2;
         private SplitContainer splitContainer2;
         private Button btnAddItem;
@@ -423,5 +475,6 @@
         private NumericUpDown txtProfit;
         private Label label4;
         private DataGridView dgvKnapsackItems;
+        private ScottPlot.FormsPlot formsPlot1;
     }
 }

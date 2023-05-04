@@ -50,17 +50,31 @@ namespace Core.Domain.Genetic.Selection
             var selected = new List<Chromosome<TGene>>();
             var random = new Random();
 
+
             // select by Probability as Roulette wheel
             for (int i = 0; i < count; i += 2)
             {
-                var first = list.First(item => item.Probability > random.NextDouble());
+                var first = list.FirstOrDefault(item => item.Probability > random.NextDouble());
+
+                if (first == null)
+                    first = list.ElementAt(random.Next(0, count));
 
                 var second = list.First();
+                int maxloop = 100;
                 do
                 {
-                    second = list.First(item => item.Probability > random.NextDouble());
+                    second = list.FirstOrDefault(item => item.Probability > random.NextDouble());
+
+                    if (second == null)
+                        second = list.ElementAt(random.Next(0, count));
+
+                    maxloop--;
                 }
-                while (first == second);
+                while (first == second && maxloop > 0);
+
+                if (second == first)
+                    second = list.ElementAt(random.Next(0, count));
+
 
                 selected.Add(first.Chromosome);
                 selected.Add(second.Chromosome);
@@ -95,7 +109,36 @@ namespace Core.Domain.Genetic.Selection
             return selected;
         }
 
-        public static IEnumerable<Chromosome<TGene>> TournamentSelection<TGene>(this GAFunctions ga, IEnumerable<Chromosome<TGene>> chromosomes, int? K = null)
+
+        public static IEnumerable<Chromosome<TGene>> BestSelection<TGene>(this GAFunctions ga, List<Chromosome<TGene>> chromosomes)
+        {
+            int count = chromosomes.Count();
+
+            var sorted = chromosomes.OrderByDescending(x => x.FF);
+
+            var selected = new List<Chromosome<TGene>>();
+            var random = new Random();
+
+            for (int i = 0; i < count / 2; i += 2)
+            {
+                var first = sorted.ElementAt(i);
+
+                var second = sorted.ElementAt(i+1);
+
+
+                selected.Add(first);
+                selected.Add(second);
+                selected.Add(first);
+                selected.Add(second);
+            }
+
+            return selected;
+        }
+
+        public static IEnumerable<Chromosome<TGene>> TournamentSelection<TGene>(
+            this GAFunctions ga,
+            IEnumerable<Chromosome<TGene>> chromosomes,
+            int? K = null)
         {
             int count = chromosomes.Count();
 
@@ -139,23 +182,13 @@ namespace Core.Domain.Genetic.Selection
             return selected;
         }
 
-        public static IEnumerable<Chromosome<TGene>> RankSelection<TGene>(this GAFunctions ga, IEnumerable<Chromosome<TGene>> chromosomes)
+        public static IEnumerable<Chromosome<TGene>> RankSelection<TGene>(
+            this GAFunctions ga,
+            IEnumerable<Chromosome<TGene>> chromosomes)
         {
             int count = chromosomes.Count();
 
-            chromosomes.ToList().Sort((x, y) =>
-            {
-                var xff= x.GetFitnessValue();
-                var yff= y.GetFitnessValue();
-
-                if (xff < yff)
-                    return -1;
-                else if (xff ==  yff)
-                    return 0;
-                else
-                    return 1;
-
-            });
+            var sorted = chromosomes.OrderByDescending(x => x.FF);
 
             if (count <= 1)
             {
@@ -169,12 +202,13 @@ namespace Core.Domain.Genetic.Selection
             var last_rp = 0.0d;
             for (int i = 1; i <= count; i++)
             {
-                double rp = (count - i + 1) / sum_rank;
+                double rp = (double)(count - i + 1) / sum_rank;
 
                 var item = new SelectionItem<TGene>()
                 {
-                    Chromosome = chromosomes.ElementAt(i-1),
+                    Chromosome = sorted.ElementAt(i - 1),
                     Probability = rp + last_rp,
+                    Rank = i
                 };
 
                 list.Add(item);
