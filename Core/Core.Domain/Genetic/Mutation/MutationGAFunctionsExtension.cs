@@ -22,7 +22,7 @@ namespace Core.Domain.Genetic.Mutation
                 chromosome.Set(p1, temp);
                 return;
             }
-             
+
             if (position1 is null)
                 position1 = new Random().Next(0, chromosome.Length);
 
@@ -44,7 +44,7 @@ namespace Core.Domain.Genetic.Mutation
             chromosome.Set(pos1, tmp);
         }
 
-        public static void InversionMutation<TGene>(this GAFunctions ga, Chromosome<TGene> chromosome, int? position1 = null, int? position2 = null)
+        public static async Task InversionMutationAsync<TGene>(this GAFunctions ga, Chromosome<TGene> chromosome, int? position1 = null, int? position2 = null)
         {
             if (chromosome.Length <= 1) return;
 
@@ -59,36 +59,39 @@ namespace Core.Domain.Genetic.Mutation
                 return;
             }
 
-            if (position1 is null)
-                position1 = new Random().Next(0, chromosome.Length);
-
-            if (position2 is null)
+            await Task.Run(() =>
             {
-                position2 = position1;
+                if (position1 is null)
+                    position1 = new Random().Next(0, chromosome.Length);
 
-                while (position2 == position1)
+                if (position2 is null)
                 {
-                    position2 = new Random().Next(0, chromosome.Length);
+                    position2 = position1;
+
+                    while (position2 == position1)
+                    {
+                        position2 = new Random().Next(0, chromosome.Length);
+                    }
                 }
-            }
 
-            int pos1 = (position1 > position2) ? (int)position1 : (int) position2;
-            int pos2 = (position1 > position2) ? (int)position2 : (int)position1;
+                int pos1 = (position1 > position2) ? (int)position1 : (int)position2;
+                int pos2 = (position1 > position2) ? (int)position2 : (int)position1;
 
-            var tmp = chromosome.GetSub(pos2, pos1-pos2);
-            tmp = tmp.Reverse().ToArray();
-            chromosome.SetRange(tmp, pos2);
+                var tmp = chromosome.GetSub(pos2, pos1 - pos2);
+                tmp = tmp.Reverse().ToArray();
+                chromosome.SetRange(tmp, pos2);
+            });
         }
 
         /// <param name="mutationProbability">0 - 1</param>
-        public static void InversionMutation<TGene>(this GAFunctions ga, IEnumerable<Chromosome<TGene>> chromosomes, double mutationProbability)
+        public static async void InversionMutation<TGene>(this GAFunctions ga, IEnumerable<Chromosome<TGene>> chromosomes, double mutationProbability)
         {
             var random = new Random();
             foreach (var chromosome in chromosomes)
             {
                 if (random.NextDouble() <= mutationProbability)
                 {
-                    ga.InversionMutation(chromosome);
+                   await ga.InversionMutationAsync(chromosome);
                 }
             }
         }
@@ -132,43 +135,49 @@ namespace Core.Domain.Genetic.Mutation
         }
 
         /// <param name="mutationProbability">0 - 1</param>
-        public static void AllBitMutation(this GAFunctions ga, Chromosome<bool> chromosome, double mutationProbability)
+        public static async Task AllBitMutationAsync(this GAFunctions ga, Chromosome<bool> chromosome, double mutationProbability)
         {
-            var r = new Random();
-            for (int i = 0; i < chromosome.Length; i++)
+            await Task.Run(() =>
             {
-                if (r.NextDouble() < mutationProbability)
-                    continue;
-
-                bool val = r.NextDouble() >= 0.5d;
-
-                chromosome.Set(i, val);
-            }
-        }
-
-        /// <param name="mutationProbability">0 - 1</param>
-        public static void BitMutation(this GAFunctions ga, IEnumerable<Chromosome<bool>> chromosomes, double mutationProbability)
-        {
-            var random = new Random();
-            foreach (var chromosome in chromosomes)
-            {
-                if (random.NextDouble() < mutationProbability)
+                var r = new Random();
+                for (int i = 0; i < chromosome.Length; i++)
                 {
-                    var point = (int)random.NextDouble() * chromosome.Length;
-                    ga.BitMutation(chromosome, point);
+                    if (r.NextDouble() < mutationProbability)
+                        continue;
+
+                    bool val = r.NextDouble() >= 0.5d;
+
+                    chromosome.Set(i, val);
                 }
-            }
+            });
         }
 
         /// <param name="mutationProbability">0 - 1</param>
-        public static void AllBitMutation(this GAFunctions ga, IEnumerable<Chromosome<bool>> chromosomes, double mutationProbability)
+        public static async Task BitMutationAsync(this GAFunctions ga, IEnumerable<Chromosome<bool>> chromosomes, double mutationProbability)
+        {
+            await Task.Run(() =>
+            {
+                var random = new Random();
+                foreach (var chromosome in chromosomes)
+                {
+                    if (random.NextDouble() < mutationProbability)
+                    {
+                        var point = (int)random.NextDouble() * chromosome.Length;
+                        ga.BitMutation(chromosome, point);
+                    }
+                }
+            });
+        }
+
+        /// <param name="mutationProbability">0 - 1</param>
+        public static async void AllBitMutation(this GAFunctions ga, IEnumerable<Chromosome<bool>> chromosomes, double mutationProbability)
         {
             var random = new Random();
             foreach (var chromosome in chromosomes)
             {
                 if (random.NextDouble() < mutationProbability)
                 {
-                    ga.AllBitMutation(chromosome, mutationProbability);
+                    await ga.AllBitMutationAsync(chromosome, mutationProbability);
                 }
             }
         }

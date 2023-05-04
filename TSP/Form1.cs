@@ -167,7 +167,7 @@ namespace TSP
                 for (int i = 0; i < generationNumber; i++)
                 {
                     // selection
-                    var selected = GA.Functions.RankSelection(population);
+                    var selected = await GA.Functions.RankSelectionAsync(population);
 
                     //crossover
                     var childs = GA.Functions.ManyPointCrossover(selected, _pc);

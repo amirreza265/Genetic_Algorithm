@@ -117,13 +117,13 @@ namespace Genetic_Algorithm
                 for (int i = 0; i < generationNumber; i++)
                 {
                     // selection
-                    var selected = GA.Functions.FPSSelection(population);
+                    var selected = await GA.Functions.FPSSelectionAsync(population);
 
                     //crossover
                     var childs = GA.Functions.ManyPointCrossover(selected, _pc);
 
                     //mutation
-                    GA.Functions.BitMutation(childs, _pm);
+                    await GA.Functions.BitMutationAsync(childs, _pm);
 
                     //crossover
                     //childs = GA.Functions.OnePointCrossover(childs, _pc);
