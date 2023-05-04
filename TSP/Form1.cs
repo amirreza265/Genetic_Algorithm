@@ -156,7 +156,7 @@ namespace TSP
                         ////if (ch.OF == 0)
                         ////    return 1;
 
-                        return 1d / ch.OF;
+                        return 1 / ch.OF;
                     };
 
                     population.Add(ch);
@@ -167,25 +167,25 @@ namespace TSP
                 for (int i = 0; i < generationNumber; i++)
                 {
                     // selection
-                    var selected = await GA.Functions.RankSelectionAsync(population);
+                    var selected = await GA.Functions.FPSSelectionAsync(population);
 
                     //crossover
-                    var childs = GA.Functions.ManyPointCrossover(selected, _pc);
+                    var childs = await GA.Functions.ManyPointCrossoverAsync(selected, _pc);
 
                     //mutation
                     if (r.NextDouble() > 0.5d)
                         GA.Functions.SwapMutation(childs, _pm);
                     else
-                        GA.Functions.InversionMutation(childs, _pm);
+                        await GA.Functions.InversionMutation(childs, _pm);
 
                     ////crossover
                     //childs = GA.Functions.OnePointCrossover(childs, _pc);
 
                     //replacment
-                    if (r.NextDouble() > 0.5d)
-                        await GA.Functions.ReplaceKeepBest(population, childs);
-                    else
-                        await GA.Functions.Replace(population, childs);
+                    //if (r.NextDouble() > 0.5d)
+                    await GA.Functions.ReplaceKeepBest(population, childs);
+                    //else
+                    //    await GA.Functions.ReplaceRank(population, childs);
 
                     //print best in console
                     var best = population.MaxBy(c => c.FF);

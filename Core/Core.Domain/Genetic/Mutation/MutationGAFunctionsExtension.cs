@@ -84,7 +84,7 @@ namespace Core.Domain.Genetic.Mutation
         }
 
         /// <param name="mutationProbability">0 - 1</param>
-        public static async void InversionMutation<TGene>(this GAFunctions ga, IEnumerable<Chromosome<TGene>> chromosomes, double mutationProbability)
+        public static async Task InversionMutation<TGene>(this GAFunctions ga, IEnumerable<Chromosome<TGene>> chromosomes, double mutationProbability)
         {
             var random = new Random();
             foreach (var chromosome in chromosomes)
