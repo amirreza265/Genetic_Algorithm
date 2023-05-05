@@ -156,7 +156,7 @@ namespace TSP
                     {
                         if (!HamiltonPath(genes)) return 0;
 
-                        return 1d + (1000d / ch.OF);
+                        return 1d + (1000d / (1 + ch.OF));
                     };
 
                     population.Add(ch);
@@ -171,16 +171,38 @@ namespace TSP
 
                     //crossover
                     int pointCount = (geneCount < 4) ? 1 : geneCount / 2;
-                    var childs = await GA.Functions.ManyPointCrossoverAsync(selected, _pc, pointCount);
+                    var childs = await GA.Functions.ManyPointCrossoverRepairAsync(selected, _pc, (genes) =>
+                    //repair 
+                    {
+                        var points = new List<PlotPoint>(_pointsList);
+                        var usedPoints = new List<PlotPoint>();
+
+                        foreach (var gene in genes)
+                        {
+                            if (usedPoints.Contains(gene))
+                            {
+                                var index = r.Next(0, points.Count);
+                                usedPoints.Add(points[index]);
+                                points.RemoveAt(index);
+                            }
+                            else
+                            {
+                                usedPoints.Add(gene);
+                                points.Remove(gene);
+                            }
+                        }
+
+                        return usedPoints.ToArray();
+                    }, pointCount);
 
                     //mutation
-                    var rd = r.NextDouble();
-                    if (rd > 0.66d)
-                        GA.Functions.SwapMutation(childs, _pm);
-                    else if (rd > 0.33)
-                        await GA.Functions.InversionMutation(childs, _pm);
-                    else
-                        await GA.Functions.DisplacementMutation(childs, _pm);
+                    //var rd = r.NextDouble();
+                    //if (rd > 0.66d)
+                    //    GA.Functions.SwapMutation(childs, _pm);
+                    //else if (rd > 0.33)
+                    //    await GA.Functions.InversionMutation(childs, _pm);
+                    //else
+                    await GA.Functions.DisplacementMutation(childs, _pm);
 
                     //GA.Functions.CustomMutation(childs, _pm, (genes) =>
                     //{

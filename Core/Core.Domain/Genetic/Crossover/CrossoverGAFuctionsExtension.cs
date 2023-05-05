@@ -148,5 +148,50 @@ namespace Core.Domain.Genetic.Crossover
 
             return list;
         }
+
+
+        public static async Task<IEnumerable<Chromosome<TGene>>> ManyPointCrossoverRepairAsync<TGene>(this GAFunctions ga, IEnumerable<Chromosome<TGene>> selected, double crossoverProbability, Func<TGene[], TGene[]> repair, int pointCount = 2)
+        {
+            int count = selected.Count();
+            List<Chromosome<TGene>> list = new List<Chromosome<TGene>>();
+
+            if (count <= 1)
+                return selected;
+
+            var random = new Random();
+            await Task.Run(() =>
+            {
+                for (int i = 0; i < count - 1; i += 2)
+                {
+                    Chromosome<TGene> paren1 = selected.ElementAt(i);
+                    Chromosome<TGene> paren2 = selected.ElementAt(i + 1);
+
+                    var child1 = paren1.Copy();
+                    var child2 = paren2.Copy();
+
+
+                    var r = random.NextDouble();
+
+                    if (r <= crossoverProbability)
+                    {
+                        List<int> points = new List<int>();
+
+                        for (int j = 0; j < pointCount; j++)
+                        {
+                            points.Add(random.Next(1, paren1.Length));
+                        }
+
+                        ga.ManyPointCrossover(paren1, paren2, ref child1, ref child2, crossoverProbability, points.ToArray());
+                        child1.SetRange(repair(child1.Genes));
+                        child2.SetRange(repair(child2.Genes));
+                    }
+
+                    list.Add(child1);
+                    list.Add(child2);
+                }
+            });
+
+            return list;
+        }
     }
 }
