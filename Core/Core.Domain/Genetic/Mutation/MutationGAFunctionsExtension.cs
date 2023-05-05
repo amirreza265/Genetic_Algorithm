@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -8,6 +9,7 @@ namespace Core.Domain.Genetic.Mutation
 {
     public static class MutationGAFunctionsExtension
     {
+        //-----------swap------------
         public static void SwapMutation<TGene>(this GAFunctions ga, Chromosome<TGene> chromosome, int? position1 = null, int? position2 = null)
         {
             if (chromosome.Length <= 1) return;
@@ -44,6 +46,20 @@ namespace Core.Domain.Genetic.Mutation
             chromosome.Set(pos1, tmp);
         }
 
+        /// <param name="mutationProbability">0 - 1</param>
+        public static void SwapMutation<TGene>(this GAFunctions ga, IEnumerable<Chromosome<TGene>> chromosomes, double mutationProbability)
+        {
+            var random = new Random();
+            foreach (var chromosome in chromosomes)
+            {
+                if (random.NextDouble() <= mutationProbability)
+                {
+                    ga.SwapMutation(chromosome);
+                }
+            }
+        }
+
+        //-----------Inversion-------
         public static async Task InversionMutationAsync<TGene>(this GAFunctions ga, Chromosome<TGene> chromosome, int? position1 = null, int? position2 = null)
         {
             if (chromosome.Length <= 1) return;
@@ -97,18 +113,64 @@ namespace Core.Domain.Genetic.Mutation
         }
 
 
+        //-----------Displacement
+        public static async Task DisplacementMutationAsync<TGene>(this GAFunctions ga, Chromosome<TGene> chromosome, int? position1 = null, int? position2 = null)
+        {
+            if (chromosome.Length <= 1) return;
+
+            if (chromosome.Length == 2)
+            {
+                int p1 = 0;
+                int p2 = 1;
+
+                var temp = chromosome.Get(p2);
+                chromosome.Set(p2, chromosome.Get(p1));
+                chromosome.Set(p1, temp);
+                return;
+            }
+
+            await Task.Run(() =>
+            {
+                var r = new Random();
+                if (position1 is null)
+                    position1 = r.Next(0, chromosome.Length);
+
+                if (position2 is null)
+                {
+                    position2 = position1;
+
+                    while (position2 == position1)
+                    {
+                        position2 = r.Next(0, chromosome.Length);
+                    }
+                }
+
+                int pos1 = (position1 > position2) ? (int)position1 : (int)position2;
+                int pos2 = (position1 > position2) ? (int)position2 : (int)position1;
+
+                var tmp = chromosome.GetSub(pos2, pos1 - pos2).ToList();
+                var count = tmp.Count;
+
+                for (int i = 0; i < count; i++)
+                {
+                    chromosome.Set(pos2 + i, tmp[r.Next(0,tmp.Count)]);
+                }
+            });
+        }
+
         /// <param name="mutationProbability">0 - 1</param>
-        public static void SwapMutation<TGene>(this GAFunctions ga, IEnumerable<Chromosome<TGene>> chromosomes, double mutationProbability)
+        public static async Task DisplacementMutation<TGene>(this GAFunctions ga, IEnumerable<Chromosome<TGene>> chromosomes, double mutationProbability)
         {
             var random = new Random();
             foreach (var chromosome in chromosomes)
             {
                 if (random.NextDouble() <= mutationProbability)
                 {
-                    ga.SwapMutation(chromosome);
+                    await ga.DisplacementMutationAsync(chromosome);
                 }
             }
         }
+
 
         public static void CustomMutation<TGene>(this GAFunctions ga, IEnumerable<Chromosome<TGene>> chromosomes, double mutationProbability, Func<TGene[], TGene[]> mutation)
         {
@@ -192,6 +254,7 @@ namespace Core.Domain.Genetic.Mutation
             TGene gene = (TGene)val.ToType(typeof(TGene), null);
             chromosome.Set((int)position, gene);
         }
+
 
 
         // TODO : add Displacement , Inversion Mutation

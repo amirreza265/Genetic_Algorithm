@@ -18,7 +18,7 @@ namespace Core.Domain.Genetic.Selection
 
     public static class ParentsSelectionGAFunctionsExtension
     {
-        public static async Task<IEnumerable<Chromosome<TGene>>> FPSSelectionAsync<TGene>(this GAFunctions ga, IEnumerable<Chromosome<TGene>> chromosomes)
+        public static async Task<IEnumerable<Chromosome<TGene>>> FPSSelectionAsync<TGene>(this GAFunctions ga, IEnumerable<Chromosome<TGene>> chromosomes, double k = 1)
         {
             int count = chromosomes.Count();
 
@@ -27,7 +27,9 @@ namespace Core.Domain.Genetic.Selection
                 return chromosomes;
             }
 
-            var sum_ff = chromosomes.Sum(c => c.GetFitnessValue());
+            if (k <= 0) k = 0;
+
+            var sum_ff = chromosomes.Sum(c => Math.Pow(c.FF, k));
 
             var list = new List<SelectionItem<TGene>>();
 
@@ -37,7 +39,7 @@ namespace Core.Domain.Genetic.Selection
                 var last_p = 0.0d;
                 foreach (var chromosome in chromosomes)
                 {
-                    double p = chromosome.GetFitnessValue() / sum_ff;
+                    double p = Math.Pow(chromosome.FF, k) / sum_ff;
 
                     var item = new SelectionItem<TGene>()
                     {
@@ -89,7 +91,7 @@ namespace Core.Domain.Genetic.Selection
             return selected;
         }
 
-        public static IEnumerable<Chromosome<TGene>> RandomSelectionAsync<TGene>(this GAFunctions ga, IEnumerable<Chromosome<TGene>> chromosomes)
+        public static async Task<IEnumerable<Chromosome<TGene>>> RandomSelectionAsync<TGene>(this GAFunctions ga, IEnumerable<Chromosome<TGene>> chromosomes)
         {
             int count = chromosomes.Count();
 
@@ -100,17 +102,19 @@ namespace Core.Domain.Genetic.Selection
 
             var selected = new List<Chromosome<TGene>>();
             var random = new Random();
-
-            for (int i = 0; i < count; i += 2)
+            await Task.Run(() =>
             {
-                var first = chromosomes.ElementAt(random.Next(0, count));
+                for (int i = 0; i < count; i += 2)
+                {
+                    var first = chromosomes.ElementAt(random.Next(0, count));
 
-                var second = chromosomes.ElementAt(random.Next(0, count));
+                    var second = chromosomes.ElementAt(random.Next(0, count));
 
 
-                selected.Add(first);
-                selected.Add(second);
-            }
+                    selected.Add(first);
+                    selected.Add(second);
+                }
+            });
 
             return selected;
         }

@@ -19,7 +19,7 @@ namespace Core.Domain.Genetic.Replacement
 
             await Task.Run(async () =>
             {
-                Chromosome<TGene> bestParent = parents.MaxBy(c => c.OF);
+                Chromosome<TGene> bestParent = parents.MaxBy(c => c.FF);
                 Chromosome<TGene> bestchild = childs.MaxBy(c => c.FF);
 
                 //parents[0] = bestchild.FF > bestParent.FF ? bestchild : bestParent;
@@ -32,16 +32,13 @@ namespace Core.Domain.Genetic.Replacement
                 {
                     for (int k = 2; k < count; k++)
                     {
-                        if (r.NextDouble() > 0.5)
-                            continue;
-
                         parents[k] = childs.ElementAt(k);
                     }
                 });
             });
         }
 
-        public static async Task ReplaceRank<TGene>(
+        public static async Task<IEnumerable<Chromosome<TGene>>> ReplaceRank<TGene>(
             this GAFunctions ga,
             List<Chromosome<TGene>> parents,
             IEnumerable<Chromosome<TGene>> childs)
@@ -57,9 +54,11 @@ namespace Core.Domain.Genetic.Replacement
                     .Take(count)
                     .ToList();
             });
+
+            return parents;
         }
 
-        public static async Task Replace<TGene>(
+        public static async Task ReplaceRandom<TGene>(
             this GAFunctions ga,
             List<Chromosome<TGene>> parents,
             IEnumerable<Chromosome<TGene>> childs)
@@ -71,6 +70,34 @@ namespace Core.Domain.Genetic.Replacement
                 Random r = new Random();
 
                 for (int k = 0; k < count; k++)
+                {
+                    if (r.NextDouble() > 0.5)
+                        parents[k] = childs.ElementAt(k);
+                }
+            });
+        }
+        
+        public static async Task ReplaceRandomKeepBest<TGene>(
+            this GAFunctions ga,
+            List<Chromosome<TGene>> parents,
+            IEnumerable<Chromosome<TGene>> childs)
+        {
+            var count = parents.Count();
+
+            await Task.Run(() =>
+            {
+                Random r = new Random();
+
+                Chromosome<TGene> bestParent = parents.MaxBy(c => c.FF);
+                Chromosome<TGene> bestchild = childs.MaxBy(c => c.FF);
+
+                //parents[0] = bestchild.FF > bestParent.FF ? bestchild : bestParent;
+                //parents[1] = bestchild.FF > bestParent.FF ? bestchild : bestParent;
+
+                parents[0] = bestParent;
+                parents[1] = bestchild;
+
+                for (int k = 2; k < count; k++)
                 {
                     if (r.NextDouble() > 0.5)
                         parents[k] = childs.ElementAt(k);

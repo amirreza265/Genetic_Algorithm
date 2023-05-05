@@ -21,8 +21,8 @@ namespace Genetic_Algorithm
         ScatterPlotList<double> _scatterPlotAvgList;
 
 
-        private double _pc = 0.8;
-        private double _pm = 0.1;
+        private double _pc = 0.85;
+        private double _pm = 0.01;
 
         private double _alpha = 0.3;
         private double _beta = 0.7;
@@ -60,17 +60,20 @@ namespace Genetic_Algorithm
 
         private void StartTraining()
         {
+            long generationNumber = (long)txtGenerationNumber.Value;
+            long knapsackMax = (long)txtKnapSackMax.Value;
+
+            var random = new Random();
+
+            var initCount = (long)txtInitCount.Value;
+            var geneCount = _knapsackItems.Count;
+            var population = new List<Chromosome<bool>>();
+
+            formsPlot1.Plot.SetAxisLimitsX(0, generationNumber);
+            formsPlot1.Refresh();
+
             new Thread(async () =>
             {
-                long generationNumber = (long)txtGenerationNumber.Value;
-                long knapsackMax = (long)txtKnapSackMax.Value;
-
-                var random = new Random();
-
-                var initCount = (long)txtInitCount.Value;
-                var geneCount = _knapsackItems.Count;
-                var population = new List<Chromosome<bool>>();
-
                 //create random population
                 SetPbarMax((int)initCount);
                 for (int i = 0; i < initCount; i++)
@@ -120,7 +123,8 @@ namespace Genetic_Algorithm
                     var selected = await GA.Functions.FPSSelectionAsync(population);
 
                     //crossover
-                    var childs = GA.Functions.ManyPointCrossover(selected, _pc);
+                    int pointCount = (geneCount < 4) ? 1 : random.Next(0, geneCount / 2);
+                    var childs = await GA.Functions.ManyPointCrossoverAsync(selected, _pc, pointCount);
 
                     //mutation
                     await GA.Functions.BitMutationAsync(childs, _pm);
@@ -153,7 +157,8 @@ namespace Genetic_Algorithm
                         _scatterPlotBstList.Add(i, best.FF);
                         _scatterPlotAvgList.Add(i, avgFf);
 
-                        formsPlot1.Plot.AxisAuto();
+
+                        formsPlot1.Plot.AxisAutoY();
                         formsPlot1.Refresh();
                     });
                 }
@@ -208,6 +213,9 @@ namespace Genetic_Algorithm
         private void btnStart_Click(object sender, EventArgs e)
         {
             txtConsole.Clear();
+            _scatterPlotAvgList.Clear();
+            _scatterPlotBstList.Clear();
+            formsPlot1.Refresh();
             StartTraining();
         }
 

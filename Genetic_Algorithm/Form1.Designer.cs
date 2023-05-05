@@ -350,7 +350,7 @@
             // btnStart
             // 
             btnStart.Name = "btnStart";
-            btnStart.Size = new Size(224, 26);
+            btnStart.Size = new Size(123, 26);
             btnStart.Text = "Start";
             btnStart.Click += btnStart_Click;
             // 

@@ -95,7 +95,7 @@ namespace Core.Domain.Genetic.Crossover
             Random r = new Random();
             int lastPoint = 0;
             bool cross = true;
-            for(int i =0; i <  points.Length; i++)
+            for (int i = 0; i < points.Length; i++)
             {
                 if (cross)
                 {
@@ -118,7 +118,7 @@ namespace Core.Domain.Genetic.Crossover
             var random = new Random();
             await Task.Run(() =>
             {
-                for (int i = 0; i < count - 1; i++)
+                for (int i = 0; i < count - 1; i += 2)
                 {
                     Chromosome<TGene> paren1 = selected.ElementAt(i);
                     Chromosome<TGene> paren2 = selected.ElementAt(i + 1);
@@ -148,7 +148,5 @@ namespace Core.Domain.Genetic.Crossover
 
             return list;
         }
-
-        // TODO : Add multiplePoint Crossover
     }
 }

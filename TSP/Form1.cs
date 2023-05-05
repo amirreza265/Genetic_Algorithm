@@ -16,7 +16,8 @@ namespace TSP
 {
     public partial class Form1 : Form
     {
-        private double _pc = 0.9d, _pm = 0.01d;
+        private const int _plotScale = 800;
+        private const double _pc = 0.75d, _pm = 0.01d;
 
 
         ScatterPlotList<double> _plotPointslist;
@@ -26,6 +27,7 @@ namespace TSP
         List<PlotPoint> _pointsList;
 
         bool _setPoint = false;
+        bool _runing = false;
 
         Color _setPointColor = Color.LightGreen;
         Color _defaultPointColor;
@@ -100,12 +102,13 @@ namespace TSP
 
         public void StartTraining()
         {
+            fplotGneration.Plot.SetAxisLimitsX(0, _plotScale);
             new Thread(async () =>
             {
                 btnStart.Invoke(() =>
                 {
-                    btnStart.Enabled = false;
                     btnAddNewPoint.Enabled = false;
+                    btnStart.Text = "STOP";
                 });
 
                 int generationNumber = (int)txtGenerationNumber.Value;
@@ -153,10 +156,7 @@ namespace TSP
                     {
                         if (!HamiltonPath(genes)) return 0;
 
-                        ////if (ch.OF == 0)
-                        ////    return 1;
-
-                        return 1 / ch.OF;
+                        return 1d + (1000d / ch.OF);
                     };
 
                     population.Add(ch);
@@ -164,28 +164,44 @@ namespace TSP
 
 
                 //generation
-                for (int i = 0; i < generationNumber; i++)
+                for (int i = 0; i < generationNumber && _runing; i++)
                 {
                     // selection
                     var selected = await GA.Functions.FPSSelectionAsync(population);
 
                     //crossover
-                    var childs = await GA.Functions.ManyPointCrossoverAsync(selected, _pc);
+                    int pointCount = (geneCount < 4) ? 1 : geneCount / 2;
+                    var childs = await GA.Functions.ManyPointCrossoverAsync(selected, _pc, pointCount);
 
                     //mutation
-                    if (r.NextDouble() > 0.5d)
+                    var rd = r.NextDouble();
+                    if (rd > 0.66d)
                         GA.Functions.SwapMutation(childs, _pm);
-                    else
+                    else if (rd > 0.33)
                         await GA.Functions.InversionMutation(childs, _pm);
+                    else
+                        await GA.Functions.DisplacementMutation(childs, _pm);
 
-                    ////crossover
-                    //childs = GA.Functions.OnePointCrossover(childs, _pc);
+                    //GA.Functions.CustomMutation(childs, _pm, (genes) =>
+                    //{
+                    //    List<PlotPoint> plotPoints = new(_pointsList);
+                    //    var newGenes = new List<PlotPoint>();
+                    //    foreach (var gene in genes)
+                    //    {
+                    //        int rIndex = r.Next(plotPoints.Count);
+
+                    //        var point = plotPoints[rIndex];
+                    //        plotPoints.RemoveAt(rIndex);
+                    //        newGenes.Add(point);
+                    //    }
+                    //    return newGenes.ToArray();
+                    //});
+
+                    //crossover
+                    //childs = await GA.Functions.ManyPointCrossoverAsync(childs, _pc, 1);
 
                     //replacment
-                    //if (r.NextDouble() > 0.5d)
                     await GA.Functions.ReplaceKeepBest(population, childs);
-                    //else
-                    //    await GA.Functions.ReplaceRank(population, childs);
 
                     //print best in console
                     var best = population.MaxBy(c => c.FF);
@@ -217,15 +233,20 @@ namespace TSP
                         //_plotGenerationsWstList.Add(i, min);
 
                         fplotPoints.Plot.Title($"Distance : {best.OF.ToString("0.00")}");
-                        fplotGneration.Plot.AxisAuto();
+
+                        if (i > _plotScale)
+                            fplotGneration.Plot.SetAxisLimitsX(i - _plotScale, i + 10);
+
+                        fplotGneration.Plot.AxisAutoY();
                         fplotGneration.Refresh();
                     });
                 }
 
                 btnStart.Invoke(() =>
-                {
-                    btnStart.Enabled = true;
-                });
+                        {
+                            btnStart.Text = "Start";
+                            _runing = false;
+                        });
 
             }).Start();
         }
@@ -250,11 +271,16 @@ namespace TSP
 
         private void btnStart_Click(object sender, EventArgs e)
         {
-            _plotGenerationsAvgList.Clear();
-            _plotGenerationsBstList.Clear();
-            _plotGenerationsWstList.Clear();
-            fplotGneration.Refresh();
-            StartTraining();
+            _runing = !_runing;
+            if (_runing)
+            {
+                _plotGenerationsAvgList.Clear();
+                _plotGenerationsBstList.Clear();
+                _plotGenerationsWstList.Clear();
+                fplotGneration.Refresh();
+                _runing = true;
+                StartTraining();
+            }
         }
 
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
