@@ -395,6 +395,7 @@
             formsPlot1.Name = "formsPlot1";
             formsPlot1.Size = new Size(947, 454);
             formsPlot1.TabIndex = 0;
+            formsPlot1.RegionChanged += formsPlot1_RegionChanged;
             // 
             // txtConsole
             // 

@@ -26,6 +26,9 @@ namespace Genetic_Algorithm
 
         private double _alpha = 0.3;
         private double _beta = 0.7;
+
+        private int _scale = 500;
+
         public Form1()
         {
             InitializeComponent();
@@ -69,7 +72,7 @@ namespace Genetic_Algorithm
             var geneCount = _knapsackItems.Count;
             var population = new List<Chromosome<bool>>();
 
-            formsPlot1.Plot.SetAxisLimitsX(0, generationNumber);
+            formsPlot1.Plot.SetAxisLimitsX(0, _scale);
             formsPlot1.Refresh();
 
             new Thread(async () =>
@@ -90,21 +93,9 @@ namespace Genetic_Algorithm
 
                     var ch = new Chromosome<bool>(geneCount);
                     ch.Genes = genes;
+                    ch.ObjectiveFunction = (gs) => GetOFValue(knapsackMax, gs);
 
-                    ch.ObjectiveFunction = (genes) =>
-                    {
-
-                        // alpha * (profit / sum(profits)) + beta * (max - w) / sum(w)
-                        int profit, weigth;
-                        GetProfitAndWeight(genes, out profit, out weigth);
-
-                        if (weigth > knapsackMax)
-                            return 0;
-
-                        return profit;
-                    };
-
-                    ch.FitnessFunction = ch.ObjectiveFunction;
+                    ch.FitnessFunction = (gs) => GetOFValue(knapsackMax, gs);
 
                     population.Add(ch);
 
@@ -157,13 +148,25 @@ namespace Genetic_Algorithm
                         _scatterPlotBstList.Add(i, best.FF);
                         _scatterPlotAvgList.Add(i, avgFf);
 
-
+                        formsPlot1.Plot.SetAxisLimitsX(i - _scale, i + 10);
                         formsPlot1.Plot.AxisAutoY();
                         formsPlot1.Refresh();
                     });
                 }
 
             }).Start();
+        }
+
+        private double GetOFValue(long knapsackMax, bool[] genes)
+        {
+            // alpha * (profit / sum(profits)) + beta * (max - w) / sum(w)
+            int profit, weigth;
+            GetProfitAndWeight(genes, out profit, out weigth);
+
+            if (weigth > knapsackMax)
+                return 0;
+
+            return profit;
         }
 
         private void GetProfitAndWeight(bool[] genes, out int profit, out int weigth)
@@ -233,6 +236,11 @@ namespace Genetic_Algorithm
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
         {
             Environment.Exit(0);
+        }
+
+        private void formsPlot1_RegionChanged(object sender, EventArgs e)
+        {
+            formsPlot1.Plot.AxisAutoY();
         }
     }
 }
