@@ -22,15 +22,15 @@ namespace Core.Domain.Genetic.Replacement
                 Chromosome<TGene> bestParent = parents.MaxBy(c => c.FF);
                 Chromosome<TGene> bestchild = childs.MaxBy(c => c.FF);
 
-                //parents[0] = bestchild.FF > bestParent.FF ? bestchild : bestParent;
+                parents[0] = bestchild.FF > bestParent.FF ? bestchild : bestParent;
                 //parents[1] = bestchild.FF > bestParent.FF ? bestchild : bestParent;
 
-                parents[0] = bestParent;
-                parents[1] = bestchild;
+                //parents[0] = bestParent;
+                //parents[1] = bestchild;
 
                 await Task.Run(() =>
                 {
-                    for (int k = 2; k < count; k++)
+                    for (int k = 1; k < count; k++)
                     {
                         parents[k] = childs.ElementAt(k);
                     }

@@ -44,6 +44,9 @@
             btnAddNewPoint = new Button();
             fplotPoints = new ScottPlot.FormsPlot();
             fplotGneration = new ScottPlot.FormsPlot();
+            menuStrip1 = new MenuStrip();
+            toolsToolStripMenuItem = new ToolStripMenuItem();
+            configureToolStripMenuItem = new ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
             splitContainer1.Panel1.SuspendLayout();
             splitContainer1.Panel2.SuspendLayout();
@@ -63,13 +66,14 @@
             splitContainer3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)txtNewpointX).BeginInit();
             ((System.ComponentModel.ISupportInitialize)txtNewpointY).BeginInit();
+            menuStrip1.SuspendLayout();
             SuspendLayout();
             // 
             // splitContainer1
             // 
             splitContainer1.BackColor = SystemColors.ButtonFace;
             splitContainer1.Dock = DockStyle.Fill;
-            splitContainer1.Location = new Point(0, 0);
+            splitContainer1.Location = new Point(0, 28);
             splitContainer1.Name = "splitContainer1";
             splitContainer1.Orientation = Orientation.Horizontal;
             // 
@@ -80,8 +84,8 @@
             // splitContainer1.Panel2
             // 
             splitContainer1.Panel2.Controls.Add(fplotGneration);
-            splitContainer1.Size = new Size(1021, 630);
-            splitContainer1.SplitterDistance = 361;
+            splitContainer1.Size = new Size(1059, 602);
+            splitContainer1.SplitterDistance = 344;
             splitContainer1.SplitterWidth = 10;
             splitContainer1.TabIndex = 0;
             // 
@@ -100,8 +104,8 @@
             // splitContainer2.Panel2
             // 
             splitContainer2.Panel2.Controls.Add(fplotPoints);
-            splitContainer2.Size = new Size(1021, 361);
-            splitContainer2.SplitterDistance = 423;
+            splitContainer2.Size = new Size(1059, 344);
+            splitContainer2.SplitterDistance = 438;
             splitContainer2.SplitterWidth = 10;
             splitContainer2.TabIndex = 0;
             // 
@@ -118,7 +122,7 @@
             panel1.Dock = DockStyle.Fill;
             panel1.Location = new Point(0, 0);
             panel1.Name = "panel1";
-            panel1.Size = new Size(423, 361);
+            panel1.Size = new Size(438, 344);
             panel1.TabIndex = 0;
             // 
             // dgvPoints
@@ -136,15 +140,15 @@
             dgvPoints.RowTemplate.Height = 29;
             dgvPoints.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dgvPoints.ShowEditingIcon = false;
-            dgvPoints.Size = new Size(421, 203);
+            dgvPoints.Size = new Size(436, 186);
             dgvPoints.TabIndex = 6;
             // 
             // btnStart
             // 
             btnStart.Dock = DockStyle.Bottom;
-            btnStart.Location = new Point(0, 330);
+            btnStart.Location = new Point(0, 313);
             btnStart.Name = "btnStart";
-            btnStart.Size = new Size(421, 29);
+            btnStart.Size = new Size(436, 29);
             btnStart.TabIndex = 5;
             btnStart.Text = "START";
             btnStart.UseVisualStyleBackColor = true;
@@ -158,7 +162,7 @@
             txtPopulation.Maximum = new decimal(new int[] { 1661992950, 1808227885, 5, 0 });
             txtPopulation.Minimum = new decimal(new int[] { 2, 0, 0, 0 });
             txtPopulation.Name = "txtPopulation";
-            txtPopulation.Size = new Size(421, 27);
+            txtPopulation.Size = new Size(436, 27);
             txtPopulation.TabIndex = 4;
             txtPopulation.Value = new decimal(new int[] { 40, 0, 0, 0 });
             // 
@@ -179,7 +183,7 @@
             txtGenerationNumber.Maximum = new decimal(new int[] { 1661992950, 1808227885, 5, 0 });
             txtGenerationNumber.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             txtGenerationNumber.Name = "txtGenerationNumber";
-            txtGenerationNumber.Size = new Size(421, 27);
+            txtGenerationNumber.Size = new Size(436, 27);
             txtGenerationNumber.TabIndex = 2;
             txtGenerationNumber.Value = new decimal(new int[] { 4000, 0, 0, 0 });
             txtGenerationNumber.ValueChanged += txtGenerationNumber_ValueChanged;
@@ -202,7 +206,7 @@
             pnlAddPoint.Dock = DockStyle.Top;
             pnlAddPoint.Location = new Point(0, 0);
             pnlAddPoint.Name = "pnlAddPoint";
-            pnlAddPoint.Size = new Size(421, 33);
+            pnlAddPoint.Size = new Size(436, 33);
             pnlAddPoint.TabIndex = 0;
             // 
             // splitContainer3
@@ -218,8 +222,8 @@
             // splitContainer3.Panel2
             // 
             splitContainer3.Panel2.Controls.Add(txtNewpointY);
-            splitContainer3.Size = new Size(323, 29);
-            splitContainer3.SplitterDistance = 153;
+            splitContainer3.Size = new Size(338, 29);
+            splitContainer3.SplitterDistance = 160;
             splitContainer3.TabIndex = 1;
             // 
             // txtNewpointX
@@ -231,7 +235,7 @@
             txtNewpointX.Maximum = new decimal(new int[] { 1241513974, 370409800, 542101, 0 });
             txtNewpointX.Minimum = new decimal(new int[] { 1241513974, 370409800, 542101, int.MinValue });
             txtNewpointX.Name = "txtNewpointX";
-            txtNewpointX.Size = new Size(153, 27);
+            txtNewpointX.Size = new Size(160, 27);
             txtNewpointX.TabIndex = 0;
             // 
             // txtNewpointY
@@ -243,7 +247,7 @@
             txtNewpointY.Maximum = new decimal(new int[] { 1241513974, 370409800, 542101, 0 });
             txtNewpointY.Minimum = new decimal(new int[] { 1241513974, 370409800, 542101, int.MinValue });
             txtNewpointY.Name = "txtNewpointY";
-            txtNewpointY.Size = new Size(166, 27);
+            txtNewpointY.Size = new Size(174, 27);
             txtNewpointY.TabIndex = 1;
             // 
             // btnAddNewPoint
@@ -265,7 +269,7 @@
             fplotPoints.Location = new Point(0, 0);
             fplotPoints.Margin = new Padding(5, 4, 5, 4);
             fplotPoints.Name = "fplotPoints";
-            fplotPoints.Size = new Size(588, 361);
+            fplotPoints.Size = new Size(611, 344);
             fplotPoints.TabIndex = 0;
             fplotPoints.MouseDown += fplotPoints_MouseDown;
             fplotPoints.MouseMove += fplotPoints_MouseMove;
@@ -278,15 +282,41 @@
             fplotGneration.Location = new Point(0, 0);
             fplotGneration.Margin = new Padding(5, 4, 5, 4);
             fplotGneration.Name = "fplotGneration";
-            fplotGneration.Size = new Size(1021, 259);
+            fplotGneration.Size = new Size(1059, 248);
             fplotGneration.TabIndex = 0;
+            // 
+            // menuStrip1
+            // 
+            menuStrip1.ImageScalingSize = new Size(20, 20);
+            menuStrip1.Items.AddRange(new ToolStripItem[] { toolsToolStripMenuItem });
+            menuStrip1.Location = new Point(0, 0);
+            menuStrip1.Name = "menuStrip1";
+            menuStrip1.Size = new Size(1059, 28);
+            menuStrip1.TabIndex = 1;
+            menuStrip1.Text = "menuStrip1";
+            // 
+            // toolsToolStripMenuItem
+            // 
+            toolsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { configureToolStripMenuItem });
+            toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
+            toolsToolStripMenuItem.Size = new Size(58, 24);
+            toolsToolStripMenuItem.Text = "Tools";
+            // 
+            // configureToolStripMenuItem
+            // 
+            configureToolStripMenuItem.Name = "configureToolStripMenuItem";
+            configureToolStripMenuItem.Size = new Size(157, 26);
+            configureToolStripMenuItem.Text = "Configure";
+            configureToolStripMenuItem.Click += configureToolStripMenuItem_Click;
             // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1021, 630);
+            ClientSize = new Size(1059, 630);
             Controls.Add(splitContainer1);
+            Controls.Add(menuStrip1);
+            MainMenuStrip = menuStrip1;
             Name = "Form1";
             Text = "Form1";
             FormClosed += Form1_FormClosed;
@@ -311,7 +341,10 @@
             splitContainer3.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)txtNewpointX).EndInit();
             ((System.ComponentModel.ISupportInitialize)txtNewpointY).EndInit();
+            menuStrip1.ResumeLayout(false);
+            menuStrip1.PerformLayout();
             ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion
@@ -332,5 +365,8 @@
         private Label label1;
         private DataGridView dgvPoints;
         private Button btnStart;
+        private MenuStrip menuStrip1;
+        private ToolStripMenuItem toolsToolStripMenuItem;
+        private ToolStripMenuItem configureToolStripMenuItem;
     }
 }

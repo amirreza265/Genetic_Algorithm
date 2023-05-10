@@ -3,6 +3,7 @@ using Core.Domain.Genetic;
 using Core.Domain.Genetic.Crossover;
 using Core.Domain.Genetic.InitialPopulation;
 using Core.Domain.Genetic.Mutation;
+using Core.Domain.Genetic.Repair;
 using Core.Domain.Genetic.Replacement;
 using Core.Domain.Genetic.Selection;
 using ScottPlot;
@@ -16,8 +17,8 @@ namespace TSP
 {
     public partial class Form1 : Form
     {
-        private const int _plotScale = 800;
-        private const double _pc = 0.75d, _pm = 0.01d;
+        private int _plotScale = 650;
+        private double _pc = 0.95d, _pm = 0.01d;
 
 
         ScatterPlotList<double> _plotPointslist;
@@ -48,6 +49,8 @@ namespace TSP
 
             dgvPoints.DataSource = null;
             dgvPoints.DataSource = _pointsList;
+
+            fplotPoints.Plot.AxisAuto();
 
             dgvPoints.Refresh();
             fplotPoints.Refresh();
@@ -137,26 +140,14 @@ namespace TSP
                     var ch = new Chromosome<PlotPoint>(geneCount, i);
                     ch.Genes = gense;
 
-                    ch.ObjectiveFunction = (gense) =>
-                    {
-                        double dis = 0.0d;
-
-                        for (int i = 1; i < gense.Length; i++)
-                        {
-                            dis += gense[i].Distance(gense[i - 1]);
-                        }
-
-                        dis += gense[gense.Length - 1].Distance(gense[0]);
-
-                        return dis;
-                    };
+                    ch.ObjectiveFunction = (gs) => TourDistance(gs);
 
                     ch.FitnessFunction =
                     (genes) =>
                     {
-                        if (!HamiltonPath(genes)) return 0;
+                        //if (!HamiltonPath(genes)) return 0;
 
-                        return 1d + (1000d / (1 + ch.OF));
+                        return (1000d / (1d + TourDistance(genes)));
                     };
 
                     population.Add(ch);
@@ -167,60 +158,25 @@ namespace TSP
                 for (int i = 0; i < generationNumber && _runing; i++)
                 {
                     // selection
-                    var selected = await GA.Functions.FPSSelectionAsync(population);
+                    var selected = await GA.Functions.RankSelectionAsync(population);
 
                     //crossover
-                    int pointCount = (geneCount < 4) ? 1 : geneCount / 2;
-                    var childs = await GA.Functions.ManyPointCrossoverRepairAsync(selected, _pc, (genes) =>
-                    //repair 
-                    {
-                        var points = new List<PlotPoint>(_pointsList);
-                        var usedPoints = new List<PlotPoint>();
-
-                        foreach (var gene in genes)
-                        {
-                            if (usedPoints.Contains(gene))
-                            {
-                                var index = r.Next(0, points.Count);
-                                usedPoints.Add(points[index]);
-                                points.RemoveAt(index);
-                            }
-                            else
-                            {
-                                usedPoints.Add(gene);
-                                points.Remove(gene);
-                            }
-                        }
-
-                        return usedPoints.ToArray();
-                    }, pointCount);
+                    var childs = await GA.Functions.CleverCrossoverAsync(selected, _pc);
 
                     //mutation
-                    //var rd = r.NextDouble();
-                    //if (rd > 0.66d)
-                    //    GA.Functions.SwapMutation(childs, _pm);
-                    //else if (rd > 0.33)
-                    //    await GA.Functions.InversionMutation(childs, _pm);
-                    //else
-                    await GA.Functions.DisplacementMutation(childs, _pm);
+                    var rd = r.NextDouble();
+                    if (rd > 0.66d)
+                        GA.Functions.SwapMutation(childs, _pm);
+                    else if (rd > 0.33)
+                        await GA.Functions.InversionMutation(childs, _pm);
+                    else
+                        await GA.Functions.DisplacementMutation(childs, _pm);
 
-                    //GA.Functions.CustomMutation(childs, _pm, (genes) =>
-                    //{
-                    //    List<PlotPoint> plotPoints = new(_pointsList);
-                    //    var newGenes = new List<PlotPoint>();
-                    //    foreach (var gene in genes)
-                    //    {
-                    //        int rIndex = r.Next(plotPoints.Count);
-
-                    //        var point = plotPoints[rIndex];
-                    //        plotPoints.RemoveAt(rIndex);
-                    //        newGenes.Add(point);
-                    //    }
-                    //    return newGenes.ToArray();
-                    //});
 
                     //crossover
-                    //childs = await GA.Functions.ManyPointCrossoverAsync(childs, _pc, 1);
+                    childs = await GA.Functions.CleverCrossoverAsync(selected, _pc);
+
+
 
                     //replacment
                     await GA.Functions.ReplaceKeepBest(population, childs);
@@ -254,7 +210,7 @@ namespace TSP
                         _plotGenerationsAvgList.Add(i, avg);
                         //_plotGenerationsWstList.Add(i, min);
 
-                        fplotPoints.Plot.Title($"Distance : {best.OF.ToString("0.00")}");
+                        fplotPoints.Plot.Title($"Distance : {best.OF.ToString("0.00")}, Points : {best.Genes.Length}");
 
                         if (i > _plotScale)
                             fplotGneration.Plot.SetAxisLimitsX(i - _plotScale, i + 10);
@@ -271,6 +227,20 @@ namespace TSP
                         });
 
             }).Start();
+        }
+
+        private static double TourDistance(PlotPoint[] points)
+        {
+            double dis = 0.0d;
+
+            for (int i = 1; i < points.Length; i++)
+            {
+                dis += points[i].Distance(points[i - 1]);
+            }
+
+            dis += points[points.Length - 1].Distance(points[0]);
+
+            return dis;
         }
 
         private static bool HamiltonPath(PlotPoint[] gense)
@@ -313,6 +283,27 @@ namespace TSP
         private void txtGenerationNumber_ValueChanged(object sender, EventArgs e)
         {
 
+        }
+
+        private void configureToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            using (var configureForm = new ConfigureForm(_pc, _pm, _plotScale, this))
+            {
+                configureForm.ShowDialog();
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="pm">1 -- 100</param>
+        /// <param name="pc">1 -- 100</param>
+        /// <param name="plotScale"></param>
+        public void SetValues(int pm = 5, int pc = 95, int plotScale = 800)
+        {
+            _plotScale = plotScale;
+            _pm = pm / 100d;
+            _pc = pc / 100d;
         }
     }
 }

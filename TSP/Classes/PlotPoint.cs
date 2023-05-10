@@ -25,7 +25,7 @@ namespace TSP.Classes
 
         public override string ToString()
         {
-            return $"({X.ToString("0.00")},{Y.ToString("0.00")})";
+            return $"({X.ToString("0.##")},{Y.ToString("0.##")})";
         }
 
         public override bool Equals(object? obj)

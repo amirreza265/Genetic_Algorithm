@@ -153,7 +153,9 @@ namespace Core.Domain.Genetic.Mutation
 
                 for (int i = 0; i < count; i++)
                 {
-                    chromosome.Set(pos2 + i, tmp[r.Next(0,tmp.Count)]);
+                    var index = r.Next(0, tmp.Count);
+                    chromosome.Set(pos2 + i, tmp[index]);
+                    tmp.RemoveAt(index);
                 }
             });
         }

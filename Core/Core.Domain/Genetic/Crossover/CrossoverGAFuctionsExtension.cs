@@ -193,5 +193,86 @@ namespace Core.Domain.Genetic.Crossover
 
             return list;
         }
+
+
+        public static void CleverCrossover<TGene>(this GAFunctions ga,
+            Chromosome<TGene> parent1,
+            Chromosome<TGene> parent2,
+            ref Chromosome<TGene> child1,
+            ref Chromosome<TGene> child2)
+        {
+            if (!parent1.Length.Equals(parent2.Length))
+            {
+                throw new NonCongenericParentsException();
+            }
+
+            var p1Copy = parent1.Genes.ToList();
+            var p2Copy = parent2.Genes.ToList();
+
+            var r = new Random();
+
+            int point1 = r.Next(0, p1Copy.Count - 1);
+            int point2 = r.Next(point1, p2Copy.Count);
+            int count = point2 - point1 + 1;
+
+            for (int i = 0; i < parent1.Length; i++)
+            {
+                //add some gene that should not moved
+                if (i < count)
+                {
+                    var p1GeneI = parent1.Get(i + point1);
+                    var p2GeneI = parent2.Get(i + point1);
+                    child1.Set(i, p1GeneI);
+                    child2.Set(i, p2GeneI);
+
+                    p1Copy.Remove(p2GeneI);
+                    p2Copy.Remove(p1GeneI);
+
+                    continue;
+                }
+
+                child1.Set(i, p2Copy.First());
+                p2Copy.RemoveAt(0);
+
+                child2.Set(i, p1Copy.First());
+                p1Copy.RemoveAt(0);
+            }
+
+        }
+
+        public static async Task<IEnumerable<Chromosome<TGene>>> CleverCrossoverAsync<TGene>(this GAFunctions ga, IEnumerable<Chromosome<TGene>> selected, double crossoverProbability)
+        {
+            int count = selected.Count();
+            List<Chromosome<TGene>> list = new List<Chromosome<TGene>>();
+
+            if (count <= 1)
+                return selected;
+
+            var random = new Random();
+            await Task.Run(() =>
+            {
+                for (int i = 0; i < count; i += 2)
+                {
+                    Chromosome<TGene> paren1 = selected.ElementAt(i);
+                    Chromosome<TGene> paren2 = selected.ElementAt(i + 1);
+
+                    var child1 = paren1.Copy();
+                    var child2 = paren2.Copy();
+
+
+                    var r = random.NextDouble();
+
+                    if (r <= crossoverProbability)
+                    {
+                        ga.CleverCrossover(paren1, paren2, ref child1, ref child2);
+                    }
+
+                    list.Add(child1);
+                    list.Add(child2);
+                }
+            });
+
+            return list;
+        }
     }
 }
