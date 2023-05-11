@@ -175,7 +175,7 @@ namespace TSP
 
 
                     //crossover
-                    //childs = await GA.Functions.CleverCrossoverAsync(selected, _pc);
+                    childs = await GA.Functions.CleverCrossoverAsync(selected, _pc);
 
 
 
