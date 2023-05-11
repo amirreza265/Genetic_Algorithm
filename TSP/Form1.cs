@@ -161,6 +161,7 @@ namespace TSP
                     var selected = await GA.Functions.RankSelectionAsync(population);
 
                     //crossover
+                    //int pointCount = (geneCount < 4) ? 1 : r.Next(1, geneCount / 2);
                     var childs = await GA.Functions.CleverCrossoverAsync(selected, _pc);
 
                     //mutation
@@ -174,7 +175,7 @@ namespace TSP
 
 
                     //crossover
-                    childs = await GA.Functions.CleverCrossoverAsync(selected, _pc);
+                    //childs = await GA.Functions.CleverCrossoverAsync(selected, _pc);
 
 
 
