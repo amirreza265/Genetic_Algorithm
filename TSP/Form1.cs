@@ -6,6 +6,7 @@ using Core.Domain.Genetic.Mutation;
 using Core.Domain.Genetic.Repair;
 using Core.Domain.Genetic.Replacement;
 using Core.Domain.Genetic.Selection;
+using Core.Services.Contracts;
 using ScottPlot;
 using ScottPlot.Plottable;
 using System.Net;
@@ -15,7 +16,7 @@ using TSP.Classes;
 
 namespace TSP
 {
-    public partial class Form1 : Form
+    public partial class Form1 : Form, IGAFormConfigure
     {
         private int _plotScale = 650;
         private double _pc = 0.95d, _pm = 0.01d;

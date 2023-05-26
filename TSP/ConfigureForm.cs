@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Core.Services.Contracts;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -14,9 +15,9 @@ namespace TSP
     {
         private int _plotScale = 650;
         private double _pc = 0.95d, _pm = 0.01d;
-        private Form1 _form1;
+        private IGAFormConfigure _form1;
 
-        public ConfigureForm(double pc, double pm, int plotScale, Form1 form1)
+        public ConfigureForm(double pc, double pm, int plotScale, IGAFormConfigure form1)
         {
             InitializeComponent();
             _pc = pc;

@@ -30,14 +30,18 @@
         {
             splitContainer1 = new SplitContainer();
             splitContainer2 = new SplitContainer();
+            btnStart = new Button();
             txtPopulation = new NumericUpDown();
             label3 = new Label();
             txtGenerationNumber = new NumericUpDown();
             label2 = new Label();
             txtLength = new NumericUpDown();
             label1 = new Label();
-            dataGridView1 = new DataGridView();
-            formsPlot1 = new ScottPlot.FormsPlot();
+            menuStrip1 = new MenuStrip();
+            toolToolStripMenuItem = new ToolStripMenuItem();
+            configureToolStripMenuItem = new ToolStripMenuItem();
+            dgvSquar = new DataGridView();
+            fplotGneration = new ScottPlot.FormsPlot();
             ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
             splitContainer1.Panel1.SuspendLayout();
             splitContainer1.Panel2.SuspendLayout();
@@ -49,7 +53,8 @@
             ((System.ComponentModel.ISupportInitialize)txtPopulation).BeginInit();
             ((System.ComponentModel.ISupportInitialize)txtGenerationNumber).BeginInit();
             ((System.ComponentModel.ISupportInitialize)txtLength).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
+            menuStrip1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)dgvSquar).BeginInit();
             SuspendLayout();
             // 
             // splitContainer1
@@ -65,7 +70,7 @@
             // 
             // splitContainer1.Panel2
             // 
-            splitContainer1.Panel2.Controls.Add(formsPlot1);
+            splitContainer1.Panel2.Controls.Add(fplotGneration);
             splitContainer1.Size = new Size(959, 671);
             splitContainer1.SplitterDistance = 346;
             splitContainer1.SplitterWidth = 6;
@@ -80,27 +85,40 @@
             // splitContainer2.Panel1
             // 
             splitContainer2.Panel1.BackColor = SystemColors.Window;
+            splitContainer2.Panel1.Controls.Add(btnStart);
             splitContainer2.Panel1.Controls.Add(txtPopulation);
             splitContainer2.Panel1.Controls.Add(label3);
             splitContainer2.Panel1.Controls.Add(txtGenerationNumber);
             splitContainer2.Panel1.Controls.Add(label2);
             splitContainer2.Panel1.Controls.Add(txtLength);
             splitContainer2.Panel1.Controls.Add(label1);
+            splitContainer2.Panel1.Controls.Add(menuStrip1);
             splitContainer2.Panel1.Margin = new Padding(5);
             // 
             // splitContainer2.Panel2
             // 
-            splitContainer2.Panel2.Controls.Add(dataGridView1);
+            splitContainer2.Panel2.Controls.Add(dgvSquar);
             splitContainer2.Size = new Size(959, 346);
             splitContainer2.SplitterDistance = 527;
             splitContainer2.SplitterWidth = 6;
             splitContainer2.TabIndex = 0;
             // 
+            // btnStart
+            // 
+            btnStart.Dock = DockStyle.Bottom;
+            btnStart.Location = new Point(0, 317);
+            btnStart.Name = "btnStart";
+            btnStart.Size = new Size(527, 29);
+            btnStart.TabIndex = 6;
+            btnStart.Text = "START";
+            btnStart.UseVisualStyleBackColor = true;
+            btnStart.Click += btnStart_Click;
+            // 
             // txtPopulation
             // 
             txtPopulation.Dock = DockStyle.Top;
             txtPopulation.Increment = new decimal(new int[] { 10, 0, 0, 0 });
-            txtPopulation.Location = new Point(0, 144);
+            txtPopulation.Location = new Point(0, 172);
             txtPopulation.Maximum = new decimal(new int[] { 1000, 0, 0, 0 });
             txtPopulation.Minimum = new decimal(new int[] { 4, 0, 0, 0 });
             txtPopulation.Name = "txtPopulation";
@@ -112,7 +130,7 @@
             // 
             label3.AutoSize = true;
             label3.Dock = DockStyle.Top;
-            label3.Location = new Point(0, 114);
+            label3.Location = new Point(0, 142);
             label3.Margin = new Padding(3, 5, 3, 5);
             label3.Name = "label3";
             label3.Padding = new Padding(5);
@@ -124,7 +142,7 @@
             // 
             txtGenerationNumber.Dock = DockStyle.Top;
             txtGenerationNumber.Increment = new decimal(new int[] { 100, 0, 0, 0 });
-            txtGenerationNumber.Location = new Point(0, 87);
+            txtGenerationNumber.Location = new Point(0, 115);
             txtGenerationNumber.Maximum = new decimal(new int[] { 1000000, 0, 0, 0 });
             txtGenerationNumber.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             txtGenerationNumber.Name = "txtGenerationNumber";
@@ -136,7 +154,7 @@
             // 
             label2.AutoSize = true;
             label2.Dock = DockStyle.Top;
-            label2.Location = new Point(0, 57);
+            label2.Location = new Point(0, 85);
             label2.Margin = new Padding(3, 5, 3, 5);
             label2.Name = "label2";
             label2.Padding = new Padding(5);
@@ -147,7 +165,7 @@
             // txtLength
             // 
             txtLength.Dock = DockStyle.Top;
-            txtLength.Location = new Point(0, 30);
+            txtLength.Location = new Point(0, 58);
             txtLength.Name = "txtLength";
             txtLength.Size = new Size(527, 27);
             txtLength.TabIndex = 1;
@@ -157,7 +175,7 @@
             // 
             label1.AutoSize = true;
             label1.Dock = DockStyle.Top;
-            label1.Location = new Point(0, 0);
+            label1.Location = new Point(0, 28);
             label1.Margin = new Padding(3, 5, 3, 5);
             label1.Name = "label1";
             label1.Padding = new Padding(5);
@@ -165,32 +183,57 @@
             label1.TabIndex = 0;
             label1.Text = "Length :";
             // 
-            // dataGridView1
+            // menuStrip1
             // 
-            dataGridView1.AllowUserToAddRows = false;
-            dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-            dataGridView1.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCellsExceptHeaders;
-            dataGridView1.BackgroundColor = SystemColors.Window;
-            dataGridView1.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridView1.Dock = DockStyle.Fill;
-            dataGridView1.Location = new Point(0, 0);
-            dataGridView1.Name = "dataGridView1";
-            dataGridView1.ReadOnly = true;
-            dataGridView1.RowHeadersWidth = 51;
-            dataGridView1.RowTemplate.Height = 29;
-            dataGridView1.Size = new Size(426, 346);
-            dataGridView1.TabIndex = 0;
-            dataGridView1.CellContentClick += dataGridView1_CellContentClick;
+            menuStrip1.ImageScalingSize = new Size(20, 20);
+            menuStrip1.Items.AddRange(new ToolStripItem[] { toolToolStripMenuItem });
+            menuStrip1.Location = new Point(0, 0);
+            menuStrip1.Name = "menuStrip1";
+            menuStrip1.Size = new Size(527, 28);
+            menuStrip1.TabIndex = 7;
+            menuStrip1.Text = "menuStrip1";
             // 
-            // formsPlot1
+            // toolToolStripMenuItem
             // 
-            formsPlot1.BackColor = SystemColors.Window;
-            formsPlot1.Dock = DockStyle.Fill;
-            formsPlot1.Location = new Point(0, 0);
-            formsPlot1.Margin = new Padding(5, 4, 5, 4);
-            formsPlot1.Name = "formsPlot1";
-            formsPlot1.Size = new Size(959, 319);
-            formsPlot1.TabIndex = 0;
+            toolToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { configureToolStripMenuItem });
+            toolToolStripMenuItem.Name = "toolToolStripMenuItem";
+            toolToolStripMenuItem.Size = new Size(52, 24);
+            toolToolStripMenuItem.Text = "Tool";
+            // 
+            // configureToolStripMenuItem
+            // 
+            configureToolStripMenuItem.Name = "configureToolStripMenuItem";
+            configureToolStripMenuItem.Size = new Size(157, 26);
+            configureToolStripMenuItem.Text = "Configure";
+            configureToolStripMenuItem.Click += configureToolStripMenuItem_Click;
+            // 
+            // dgvSquar
+            // 
+            dgvSquar.AllowUserToAddRows = false;
+            dgvSquar.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            dgvSquar.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCellsExceptHeaders;
+            dgvSquar.BackgroundColor = SystemColors.Window;
+            dgvSquar.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dgvSquar.Dock = DockStyle.Fill;
+            dgvSquar.GridColor = SystemColors.Window;
+            dgvSquar.Location = new Point(0, 0);
+            dgvSquar.Name = "dgvSquar";
+            dgvSquar.ReadOnly = true;
+            dgvSquar.RowHeadersWidth = 51;
+            dgvSquar.RowTemplate.Height = 29;
+            dgvSquar.Size = new Size(426, 346);
+            dgvSquar.TabIndex = 0;
+            dgvSquar.CellContentClick += dataGridView1_CellContentClick;
+            // 
+            // fplotGneration
+            // 
+            fplotGneration.BackColor = SystemColors.Window;
+            fplotGneration.Dock = DockStyle.Fill;
+            fplotGneration.Location = new Point(0, 0);
+            fplotGneration.Margin = new Padding(5, 4, 5, 4);
+            fplotGneration.Name = "fplotGneration";
+            fplotGneration.Size = new Size(959, 319);
+            fplotGneration.TabIndex = 0;
             // 
             // Form1
             // 
@@ -198,8 +241,10 @@
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(959, 671);
             Controls.Add(splitContainer1);
+            MainMenuStrip = menuStrip1;
             Name = "Form1";
-            Text = "Form1";
+            Text = "Magic Square";
+            Load += Form1_Load;
             splitContainer1.Panel1.ResumeLayout(false);
             splitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)splitContainer1).EndInit();
@@ -212,7 +257,9 @@
             ((System.ComponentModel.ISupportInitialize)txtPopulation).EndInit();
             ((System.ComponentModel.ISupportInitialize)txtGenerationNumber).EndInit();
             ((System.ComponentModel.ISupportInitialize)txtLength).EndInit();
-            ((System.ComponentModel.ISupportInitialize)dataGridView1).EndInit();
+            menuStrip1.ResumeLayout(false);
+            menuStrip1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)dgvSquar).EndInit();
             ResumeLayout(false);
         }
 
@@ -220,13 +267,17 @@
 
         private SplitContainer splitContainer1;
         private SplitContainer splitContainer2;
-        private DataGridView dataGridView1;
-        private ScottPlot.FormsPlot formsPlot1;
+        private DataGridView dgvSquar;
+        private ScottPlot.FormsPlot fplotGneration;
         private Label label1;
         private NumericUpDown txtPopulation;
         private Label label3;
         private NumericUpDown txtGenerationNumber;
         private Label label2;
         private NumericUpDown txtLength;
+        private Button btnStart;
+        private MenuStrip menuStrip1;
+        private ToolStripMenuItem toolToolStripMenuItem;
+        private ToolStripMenuItem configureToolStripMenuItem;
     }
 }
