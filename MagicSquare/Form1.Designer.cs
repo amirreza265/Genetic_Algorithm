@@ -210,6 +210,7 @@
             // dgvSquar
             // 
             dgvSquar.AllowUserToAddRows = false;
+            dgvSquar.AllowUserToDeleteRows = false;
             dgvSquar.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             dgvSquar.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCellsExceptHeaders;
             dgvSquar.BackgroundColor = SystemColors.Window;
@@ -221,6 +222,7 @@
             dgvSquar.ReadOnly = true;
             dgvSquar.RowHeadersWidth = 51;
             dgvSquar.RowTemplate.Height = 29;
+            dgvSquar.ShowEditingIcon = false;
             dgvSquar.Size = new Size(426, 346);
             dgvSquar.TabIndex = 0;
             dgvSquar.CellContentClick += dataGridView1_CellContentClick;
