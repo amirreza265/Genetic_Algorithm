@@ -43,6 +43,7 @@ namespace MagicSquare
         public void StartTraining()
         {
             fplotGneration.Plot.SetAxisLimitsX(0, _plotScale);
+
             new Thread(async () =>
             {
                 btnStart.Invoke(() =>
@@ -60,6 +61,23 @@ namespace MagicSquare
                 List<Chromosome<int>> population = new();
 
                 Random r = new Random();
+
+                // create table of numbers
+                dgvSquar.Invoke(() =>
+                {
+                    dgvSquar.Columns.Clear();
+
+                    for (int i = 0; i < length; i++)
+                    {
+                        dgvSquar.Columns.Add($"number{i}", "");
+                    }
+
+                    for (int i = 0; i < length; i++)
+                    {
+                        dgvSquar.Rows.Add();
+                    }
+                    dgvSquar.Refresh();
+                });
 
                 //create random population
                 for (int i = 0; i < populationNumber; i++)
@@ -160,18 +178,13 @@ namespace MagicSquare
                     //show best in dgvNumbers `1
                     dgvSquar.Invoke(() =>
                     {
-                        dgvSquar.Columns.Clear();
                         for (int i = 0; i < length; i++)
-                        {
-                            dgvSquar.Columns.Add($"number{i}", "");
-                        }
+                            for (int j = 0; j < length; j++)
+                            {
+                                int itemIndex = i * length + j;
+                                dgvSquar.Rows[i].Cells[j].Value = best?.Genes[itemIndex];
+                            }
 
-                        for(int i = 0;i < length; i++)
-                        {
-                            int start = i * length;
-                            int end = start + length;
-                            dgvSquar.Rows.Add(best.Genes[start..end]);
-                        }
                         dgvSquar.Refresh();
                     });
 
